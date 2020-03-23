@@ -1,0 +1,36 @@
+version: '2'
+services:
+  auth:
+      image: amitmahajan/logistics-auth:0.1
+      ports:
+        - "8090:8090"
+      environment:
+        DB_AUTH_IP: host.docker.internal
+  orders:
+    image: amitmahajan/logistics-order-api:1.0
+    ports:
+      - "9001:9001"
+    environment:
+      DB_HOST_IP: host.docker.internal
+      KAFKA_INFRA_HOST_IP: kafka
+  stock:
+    image: amitmahajan/logistics-stock-api:1.0
+    ports:
+      - "9004:9004"
+    environment:
+      DB_HOST_IP: host.docker.internal
+      KAFKA_INFRA_HOST_IP: kafka
+  shipment:
+    image: amitmahajan/logistics-shipment-api:1.0
+    ports:
+      - "9002:9002"
+    environment:
+      DB_HOST_IP: host.docker.internal
+      KAFKA_INFRA_HOST_IP: kafka
+  query:
+    image: amitmahajan/logistics-query-api:1.0
+    ports:
+      - "9003:9003"
+    environment:
+      DB_HOST_IP: host.docker.internal
+      KAFKA_INFRA_HOST_IP: kafka

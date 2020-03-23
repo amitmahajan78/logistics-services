@@ -1,0 +1,62 @@
+server:
+  port: ${PORT:9004}
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  application:
+    name: Stock Application
+  datasource:
+    url: jdbc:postgresql://${DB_HOST_IP:localhost}:5432/stock_db
+    username: ${POSTGRESQL_USERNAME:orderdemo}
+    password: ${POSTGRESQL_PASSWORD:secret}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQL95Dialect
+        jdbc:
+          lob:
+            non_contextual_creation: true
+        hbm2ddl.auto: update
+        implicit_naming_strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
+        physical_naming_strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
+
+security:
+  oauth2:
+    client:
+      client-id: server-server
+      client-secret: server-server
+      access-token-uri: http://${AUTH_SERVER_URL:localhost}:8090/oauth/token
+      user-authorization-uri: http://${AUTH_SERVER_URL:localhost}:8090/oauth/authorize
+      scope: read,write,trust
+      grant-type: client_credentials
+    resource:
+      id: resource_id
+      # URI of the token decoding endpoint.
+      tokenInfoUri: http://${AUTH_SERVER_URL:localhost}:8090/oauth/check_token
+
+spring.main.allow-bean-definition-overriding: true
+
+axon:
+  snapshot:
+    trigger:
+      treshold:
+        order: 100
+  kafka:
+    default-topic: logistics-events
+    producer:
+      retries: 5
+      bootstrap-servers: ${KAFKA_INFRA_HOST_IP:localhost}:9092
+      transaction-id-prefix: stock-tx
+    consumer:
+      group-id: stock-command-group
+      bootstrap-servers: ${KAFKA_INFRA_HOST_IP:localhost}:9092
+  distributed:
+    enabled: true
+  serializer:
+    messages: xstream
+  eventhandling:
+    processors:
+      command-processor:
+        mode: tracking
+        source: kafkaMessageSource
