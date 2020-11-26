@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
 public class OrderProcessHandler {
 
     private final CommandGateway commandGateway;
-    
+
     @EventHandler
     public void on(OrderCreatedEvt orderCreatedEvt) {
         for (OrderDetail orderDetail : orderCreatedEvt.getOrder().getOrderDetailsList()) {

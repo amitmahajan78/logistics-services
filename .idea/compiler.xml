@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="cmd-order" />
+        <module name="common" />
+        <module name="query" />
+        <module name="cmd-shipment" />
+        <module name="cmd-stock" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="cmd-order" target="1.8" />
+      <module name="cmd-shipment" target="1.8" />
+      <module name="cmd-stock" target="1.8" />
+      <module name="common" target="1.8" />
+      <module name="logistics-demo" target="1.8" />
+      <module name="query" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="cmd-order" options="-parameters" />
+      <module name="cmd-shipment" options="-parameters" />
+      <module name="cmd-stock" options="-parameters" />
+      <module name="common" options="-parameters" />
+      <module name="query" options="-parameters" />
+    </option>
+  </component>
+</project>

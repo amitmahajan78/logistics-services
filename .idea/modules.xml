@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/cmd-order/cmd-order.iml" filepath="$PROJECT_DIR$/cmd-order/cmd-order.iml" />
+      <module fileurl="file://$PROJECT_DIR$/cmd-shipment/cmd-shipment.iml" filepath="$PROJECT_DIR$/cmd-shipment/cmd-shipment.iml" />
+      <module fileurl="file://$PROJECT_DIR$/cmd-stock/cmd-stock.iml" filepath="$PROJECT_DIR$/cmd-stock/cmd-stock.iml" />
+      <module fileurl="file://$PROJECT_DIR$/common/common.iml" filepath="$PROJECT_DIR$/common/common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/logistics-demo.iml" filepath="$PROJECT_DIR$/logistics-demo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/query/query.iml" filepath="$PROJECT_DIR$/query/query.iml" />
+    </modules>
+  </component>
+</project>

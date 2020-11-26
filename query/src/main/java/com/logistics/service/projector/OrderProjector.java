@@ -10,6 +10,7 @@ import com.logistics.service.api.order.types.OrderTypes;
 import com.logistics.service.api.stock.evt.StockAllocatedEvt;
 import com.logistics.service.api.stock.evt.StockNotAvailableEvt;
 import com.logistics.service.view.model.Bookings;
+import com.logistics.service.view.model.FlatOrder;
 import com.logistics.service.view.model.OrderDetails;
 import com.logistics.service.view.model.Orders;
 import lombok.RequiredArgsConstructor;
@@ -38,24 +39,75 @@ public class OrderProjector {
         // persisting each order details
         for (OrderDetail orderDetail : orderCreatedEvt.getOrder().getOrderDetailsList()) {
             entityManager.persist(orderDetailsConvertToModel(orderDetail, orderCreatedEvt.getOrder().getOrderId()));
+
+
+            entityManager.persist(FlatOrder.builder()
+                    .flatOrderId(UUID.randomUUID())
+                    .orderId(orderCreatedEvt.getOrderUUID())
+                    .orderDetailId(orderDetail.getOrderDetailId())
+                    .shipFrom(orderCreatedEvt.getOrder().getBookings().getShipFrom())
+                    .shipTo(orderCreatedEvt.getOrder().getBookings().getShipTo())
+                    .productId(orderDetail.getProductId())
+                    .quantity(orderDetail.getQuantity())
+                    .orderDetailStatus(OrderStatusType.ORDER_RECEIVED.toString())
+                    .localDateTime(LocalDateTime.now())
+                    .build());
+
+
         }
     }
 
     @EventHandler
     public void on(StockNotAvailableEvt event) {
         updateOrderDetailStatus(OrderStatusType.STOCK_NOT_AVAILABLE, event.getOrderDetailUUID());
+
+
+        entityManager.persist(FlatOrder.builder()
+                .flatOrderId(UUID.randomUUID())
+                .orderId(event.getOrderId())
+                .orderDetailId(event.getOrderDetailUUID())
+                .shipFrom(event.getOrder().getBookings().getShipFrom())
+                .shipTo(event.getOrder().getBookings().getShipTo())
+                .productId(event.getSku())
+                .quantity(event.getQuantity())
+                .orderDetailStatus(OrderStatusType.STOCK_NOT_AVAILABLE.toString())
+                .localDateTime(LocalDateTime.now())
+                .build());
     }
 
 
     @EventHandler
     public void on(StockAllocatedEvt event) {
         updateOrderDetailStatus(OrderStatusType.STOCK_ALLOCATED, event.getOrderDetailUUID());
+
+        entityManager.persist(FlatOrder.builder()
+                .flatOrderId(UUID.randomUUID())
+                .orderId(event.getOrderId())
+                .orderDetailId(event.getOrderDetailUUID())
+                .shipFrom(event.getOrder().getBookings().getShipFrom())
+                .shipTo(event.getOrder().getBookings().getShipTo())
+                .productId(event.getSku())
+                .quantity(event.getQuantity())
+                .orderDetailStatus(OrderStatusType.STOCK_ALLOCATED.toString())
+                .localDateTime(LocalDateTime.now())
+                .build());
     }
 
     @EventHandler
-    public void on(OrderPlacedEvt event)
-    {
+    public void on(OrderPlacedEvt event) {
         updateOrderDetailStatus(OrderStatusType.ORDER_PLACED, event.getOrderDetailId());
+
+        entityManager.persist(FlatOrder.builder()
+                .flatOrderId(UUID.randomUUID())
+                .orderId(event.getOrderId())
+                .orderDetailId(event.getOrderDetailId())
+                .shipFrom(event.getShipFrom())
+                .shipTo(event.getShipTo())
+                .productId(event.getProductId())
+                .quantity(event.getQuantity())
+                .orderDetailStatus(OrderStatusType.ORDER_PLACED.toString())
+                .localDateTime(LocalDateTime.now())
+                .build());
     }
 
     private Orders ordersConvertToModel(Order order) {

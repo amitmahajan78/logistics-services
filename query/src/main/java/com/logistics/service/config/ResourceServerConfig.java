@@ -68,12 +68,7 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
                 .headers().frameOptions().disable()
                 .and()
                 .authorizeRequests()
-                .antMatchers("/api/v1/hello/**").permitAll()
-                .antMatchers(HttpMethod.GET, "/v2/**").access("#oauth2.hasScope('read')")
-                .antMatchers(HttpMethod.POST, "/v2/**").access("#oauth2.hasScope('write')")
-                .antMatchers(HttpMethod.PATCH, "/v2/**").access("#oauth2.hasScope('write')")
-                .antMatchers(HttpMethod.PUT, "/v2/**").access("#oauth2.hasScope('write')")
-                .antMatchers(HttpMethod.DELETE, "/v2/**").access("#oauth2.hasScope('write')")
+                .antMatchers("/v2/**").permitAll()
                 .and()
                 .authorizeRequests()
                 .anyRequest().authenticated();

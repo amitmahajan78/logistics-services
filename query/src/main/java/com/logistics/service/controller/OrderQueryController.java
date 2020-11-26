@@ -1,10 +1,13 @@
 package com.logistics.service.controller;
 
 
+import com.google.common.base.Stopwatch;
+import com.logistics.service.controller.dto.FlatOrder;
 import com.logistics.service.controller.dto.Orders;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -12,8 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import java.util.ArrayList;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
@@ -21,6 +24,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 @RestController
 @RequestMapping("v2/query/orders")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*")
 public class OrderQueryController {
 
     @PersistenceContext
@@ -28,6 +32,7 @@ public class OrderQueryController {
 
     @RequestMapping(method = GET, value = "/{orderId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public Orders getOrder(@PathVariable String orderId) {
+        Stopwatch watch = Stopwatch.createStarted();
 
         // query order and bookings
         Query query1 = entityManager.createQuery("SELECT o FROM Orders o " +
@@ -39,9 +44,14 @@ public class OrderQueryController {
                 "WHERE o.orderId = UUID(:orderId)");
         query2.setParameter("orderId", UUID.fromString(orderId));
 
+        Orders orders = new Orders();
+        orders.setOrders((com.logistics.service.view.model.Orders) query1.getSingleResult());
+        orders.setOrderDetailsList(query2.getResultList());
 
-        return new Orders((com.logistics.service.view.model.Orders) query1.getSingleResult(),
-                query2.getResultList());
+
+        orders.setExecutionTime("Duration: " + watch.elapsed(TimeUnit.MILLISECONDS) + " ms");
+
+        return orders;
     }
 
     // SELECT * FROM orders order by order_creation_time DESC LIMIT 10;
@@ -75,5 +85,36 @@ public class OrderQueryController {
 
         return orderList;
     }
+
+    @RequestMapping(method = GET, value = "/statusCount", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<Object> getOrderStatusCount() {
+        Map<String, Integer> orderStatusMap = new HashMap<>();
+        Query query1 = entityManager.createQuery("SELECT o.orderDetailStatus, count(o.orderDetailStatus) " +
+                "FROM OrderDetails o " +
+                "GROUP BY o.orderDetailStatus");
+
+        return query1.getResultList();
+    }
+
+    @RequestMapping(method = GET, value = "/events/{orderId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<FlatOrder> getFlatOrder(@PathVariable String orderId) {
+
+        // query order and bookings
+        Query query1 = entityManager.createQuery("SELECT o FROM FlatOrder o " +
+                "WHERE o.orderId = UUID(:orderId)");
+        query1.setParameter("orderId", UUID.fromString(orderId));
+
+        return query1.getResultList();
+    }
+
+    @RequestMapping(method = GET, value = "/all-events", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<FlatOrder> getFlatOrder() {
+
+        // query order and bookings
+        Query query1 = entityManager.createQuery("SELECT o FROM FlatOrder o " +
+                " order by o.localDateTime desc").setMaxResults(100);
+        return query1.getResultList();
+    }
+
 
 }
